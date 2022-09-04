@@ -1,0 +1,73 @@
+﻿@page "/parentAccountInformation/{accountId}/"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+<PageTitle>Parent Information</PageTitle>
+
+<h1>Parent Information</h1>
+<br/>
+
+<EditForm Model="@informationModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>Clinic Name </div>    
+    <InputText id="name" @bind-Value="informationModel.ParentFirstName" />
+    <div>Clinic Address </div>    
+    <InputText id="name" @bind-Value="informationModel.ParentLastName" />
+    <div>Country</div>
+    <InputText id="name" @bind-Value="informationModel.Month" />
+    <div>Region</div>
+    <InputText id="name" @bind-Value="informationModel.Day" />
+    <div>Clinic Name </div>    
+    <InputText id="name" @bind-Value="informationModel.Year" />
+    <div>Clinic Address </div>    
+    <InputText id="name" @bind-Value="informationModel.Country" />
+    <div>Region</div>
+    <InputText id="name" @bind-Value="informationModel.Region" />
+
+    
+    <br/>
+    <br/>
+
+    <button type="submit">Next</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string accountId{ get; set; }
+
+    private InformationModel informationModel = new();
+
+
+    private async Task HandleValidSubmit()
+    {
+        informationModel.ParentId = accountId;
+
+        var response = await _httpClient.PostAsync($"https://localhost:7083/api/Accounts/personal/addParentAccountInformation", 
+            new StringContent(JsonConvert.SerializeObject(informationModel), Encoding.UTF8, "application/json"));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"completeCreatingClinicAccount failed for account: {accountId}");
+        }
+
+        UriHelper.NavigateTo($"/CreateDependent/{accountId}");
+    }
+
+    public class InformationModel
+    {
+        public string ParentId { get; set; }
+        public string ParentFirstName { get; set; } = "George Herman";
+        public string ParentLastName { get; set; } = "Ruth";
+        public string Month { get; set; } = "2";
+        public string Day { get; set; } = "6";
+        public string Year { get; set; } = "1895";
+        public string Country { get; set; } = "USA";
+        public string Region { get; set; } = "NW";
+    }
+}

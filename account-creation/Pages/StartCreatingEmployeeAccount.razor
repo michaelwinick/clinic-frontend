@@ -1,0 +1,53 @@
+﻿@page "/startCreatingEmployeeAccount/{clinicId}"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Employee Information</h1>
+<br/>
+
+<EditForm Model="@employeeModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>First Name:</div> 
+    <InputText id="name" @bind-Value="employeeModel.FirstName" />
+    <div>Last Name: </div>
+    <InputText id="name" @bind-Value="employeeModel.LastName" />
+    <div>Title:</div> 
+    <InputText id="name" @bind-Value="employeeModel.Title" />
+    <div>Default Language:</div> 
+    <InputText id="name" @bind-Value="employeeModel.Email" />
+    <br/>
+    <button type="submit">Next</button>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public string clinicId{ get; set; }
+
+    private EmployeeModel employeeModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        employeeModel.ClinicId = clinicId;
+
+        var response = await _httpClient.PostAsync("https://localhost:7083/api/Accounts/professional/startCreatingEmployeeAccount", 
+            new StringContent(JsonConvert.SerializeObject(employeeModel), Encoding.UTF8, "application/json"));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Logger.LogError(response.ReasonPhrase);
+            return;
+        }
+
+        var employeeAccountId = await response.Content.ReadAsStringAsync();
+
+        UriHelper.NavigateTo($"/emailSentToUser/{clinicId}/{employeeAccountId}");
+    }
+}

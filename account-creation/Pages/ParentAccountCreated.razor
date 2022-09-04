@@ -1,0 +1,22 @@
+﻿@page "/parentAccountCreated/{parentAccountId}/{dependentId}"
+@inject NavigationManager UriHelper
+@inject IJSRuntime JsRuntime
+
+
+<PageTitle>Parent Account Created</PageTitle>
+
+<h1>Parent Account Created</h1>
+<br/>
+<div>Parent Account Id: @parentAccountId </div>
+<div>Dependent Account Id: @dependentId</div>
+<br/>
+
+@code {
+
+    [Parameter]
+    public string parentAccountId { get; set; }
+
+    [Parameter]
+    public string dependentId { get; set; }
+
+}

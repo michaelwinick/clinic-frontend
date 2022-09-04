@@ -1,0 +1,27 @@
+﻿@page "/PersonalOrProfessional"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Account Type</h1>
+<br/>
+<br/>
+<button class="btn btn-primary" @onclick="Personal">Personal Account</button>
+<button class="btn btn-primary" @onclick="Professional">Professional Account</button>
+
+@code {
+
+
+    private void Personal()
+    {
+        UriHelper.NavigateTo("/PersonalOrParent");
+    }
+
+    private void Professional()
+    {
+        UriHelper.NavigateTo("/CreateProfessionalAccount");
+    }
+}

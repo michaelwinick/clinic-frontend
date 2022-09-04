@@ -1,0 +1,43 @@
+﻿@page "/checkForEmployeeVerification/{accountId}/{clinicId}"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@using System.Net
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+<PageTitle>Waiting for Employee Verification</PageTitle>
+
+<h1>Waiting for Employee Verification</h1>
+<br/>
+<div>Account Id: @accountId</div>
+<div>Clinic Id: @clinicId</div>
+
+<br/>
+
+@code {
+    [Parameter]
+    public string accountId { get; set; }
+    [Parameter]
+    public string clinicId{ get; set; }
+
+    private System.Threading.Timer? timer; // NOTE: THIS LINE OF CODE ADDED
+
+    protected override async Task OnInitializedAsync()
+    {
+    // NOTE: THE FOLLOWING CODE ADDED
+        timer = new System.Threading.Timer(async (object? stateInfo) =>
+        {
+            var response = await _httpClient.GetAsync($"https://localhost:7083/api/Accounts/professional/isEmployeeVerified/{accountId}");
+            StateHasChanged(); // NOTE: MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
+            if (response.IsSuccessStatusCode)
+            {
+                Logger.LogInformation($"Account: {accountId} now verified!");
+
+                UriHelper.NavigateTo($"/employeeVerified/{accountId}/{clinicId}");
+            }
+        }, new System.Threading.AutoResetEvent(false), 1000, 1000); 
+    }
+}

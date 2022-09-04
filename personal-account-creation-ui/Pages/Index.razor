@@ -1,0 +1,44 @@
+﻿@page "/"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Create Personal Account</h1>
+<br/>
+
+<EditForm Model="@invitationModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    Enter Invitation: 
+    <InputText id="name" @bind-Value="invitationModel.Invitation" />
+    <br/>
+    <button type="submit">Next</button>
+</EditForm>
+
+@code {
+
+    public record Invitation([property: JsonPropertyName("invitation")] string invitation);
+
+
+    private InvitationModel invitationModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        Logger.LogInformation("HandleValidSubmit called in Enter Invitation");
+
+        var invitation = new Invitation(invitationModel.Invitation);
+
+        var response = await _httpClient.PostAsync("https://localhost:7083/api/Accounts/personal", 
+            new StringContent(JsonConvert.SerializeObject(invitation), Encoding.UTF8, "application/json"));
+
+        var pumperAccountId = await response.Content.ReadAsStringAsync();
+
+        
+        UriHelper.NavigateTo($"/personalAccountInformation/{pumperAccountId}");
+    }
+}

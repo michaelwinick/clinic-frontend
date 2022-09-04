@@ -1,0 +1,35 @@
+﻿@page "/emailSentToUser/{clinicId}/{employeeId}"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Email Sent to User</h1>
+<br/>
+<br/>
+<button class="btn btn-primary" @onclick="AddUser">ADD USERS TO THIS CLINIC</button>
+<button class="btn btn-primary" @onclick="Done">DONE</button>
+
+<div>ClinicId: @clinicId</div>
+<div>Employee Id: @employeeId</div>
+
+
+@code {
+    [Parameter]
+    public string clinicId{ get; set; }
+
+    [Parameter]
+    public string employeeId { get; set; }
+
+    private void AddUser()
+    {
+        UriHelper.NavigateTo($"/adminOrUser/{clinicId}");
+    }
+
+    private void Done()
+    {
+        UriHelper.NavigateTo($"/checkForEmployeeVerification/{employeeId}/{clinicId}");
+    }
+}

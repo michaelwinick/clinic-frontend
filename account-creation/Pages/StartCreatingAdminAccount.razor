@@ -1,0 +1,53 @@
+﻿@page "/startCreatingAdminAccount/{clinicId}"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Administration Information</h1>
+<br/>
+
+<EditForm Model="@invitationModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>First Name</div> 
+    <InputText id="name" @bind-Value="invitationModel.FirstName" />
+    <div>Title</div>
+    <InputText id="name" @bind-Value="invitationModel.Title" />
+    <div>Last Name</div>
+    <InputText id="name" @bind-Value="invitationModel.LastName" />
+    <br/>
+    <button type="submit">Next</button>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public string clinicId{ get; set; }
+
+    private InvitationModel invitationModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        //Logger.LogInformation("HandleValidSubmit called in Enter ClinicId");
+
+        invitationModel.ClinicId = clinicId;
+
+        var response = await _httpClient.PostAsync("https://localhost:7083/api/Accounts/professional/startCreatingAdministratorAccount", 
+            new StringContent(JsonConvert.SerializeObject(invitationModel), Encoding.UTF8, "application/json"));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Logger.LogError(response.ReasonPhrase);
+            return;
+        }
+
+        var adminAccountId = await response.Content.ReadAsStringAsync();
+        
+        UriHelper.NavigateTo($"/adminAccountCredentials/{adminAccountId}/{invitationModel.ClinicId}");
+    }
+}

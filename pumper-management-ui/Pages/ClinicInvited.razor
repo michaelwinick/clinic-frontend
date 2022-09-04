@@ -1,0 +1,23 @@
+﻿@page "/clinicInvited/{clinicId}/{pumperAccountId}"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Share Access Granted </h1>
+<div>Pumper: <b>@pumperAccountId</b> Gave Report Access to Clinic: <b>@clinicId</b></div>
+
+@code {
+
+    [Parameter]
+    public string pumperAccountId { get; set; }
+    [Parameter]
+    public string clinicId{ get; set; }
+
+    public record Invitation([property: JsonPropertyName("clinicId")] string clinicId);
+    
+    }

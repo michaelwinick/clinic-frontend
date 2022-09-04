@@ -1,0 +1,34 @@
+﻿@page "/adminAccountCreated/{accountId}/{clinicId}"
+@inject NavigationManager UriHelper
+@inject IJSRuntime JsRuntime
+
+
+<PageTitle>Create Account</PageTitle>
+
+<h1>Professional Account Created</h1>
+<br/>
+
+<br/>
+<button class="btn btn-primary" @onclick="Next">ADD USERS TO THIS CLINIC</button>
+<button class="btn btn-primary" @onclick="Continue">CONTINUE</button>
+
+
+<div>Account Id: @accountId</div>
+<div>Client Id: @clinicId</div>
+
+@code {
+    [Parameter]
+    public string accountId { get; set; }
+    [Parameter]
+    public string clinicId{ get; set; }
+
+    private void Next()
+    {
+        UriHelper.NavigateTo($"/adminOrUser/{clinicId}");
+    }
+
+    private void Continue()
+    {
+          UriHelper.NavigateTo($"/checkForEmployeeVerification/{accountId}/{clinicId}");
+    }
+}

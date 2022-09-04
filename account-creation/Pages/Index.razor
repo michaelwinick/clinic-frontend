@@ -1,0 +1,56 @@
+﻿@page "/"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Sign In</h1>
+<br/>
+
+<EditForm Model="@_loginModelModel" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        Email:
+        <InputText id="name" @bind-Value="_loginModelModel.Email" />
+    </div> 
+    <div>
+        Password:
+        <InputText id="name" @bind-Value="_loginModelModel.Password"/>
+    </div>
+    <br/>
+    <div>
+        <button class="btn btn-primary" @onclick="Continue">Sign In</button>
+        <br/>
+        <button class="btn btn-primary" @onclick="HandleValidSubmit">Create Account</button>
+
+    </div>
+</EditForm>
+
+@code {
+
+    public record Invitation([property: JsonPropertyName("invitation")] string invitation);
+
+
+    private LoginModel _loginModelModel = new();
+
+    private void Continue()
+    {
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        UriHelper.NavigateTo($"/PersonalOrProfessional");
+    }
+
+    private class LoginModel
+    {
+        public string? Email { get; set; }
+        public string? Password { get; set; }
+    }
+
+}

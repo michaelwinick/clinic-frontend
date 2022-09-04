@@ -1,0 +1,29 @@
+﻿@page "/personalAccountCreated/{accountId}"
+@inject NavigationManager UriHelper
+@inject IJSRuntime JsRuntime
+
+
+<PageTitle>Personal Account Created</PageTitle>
+
+<h1>Personal Account Created!</h1>
+<br/>
+<div>Account Id: @accountId</div>
+<br/>
+<button class="btn btn-primary" @onclick="Next">Create Another</button>
+<button class="btn btn-primary" @onclick="Exit">Exit</button>
+
+
+@code {
+    [Parameter]
+    public string accountId { get; set; }
+
+    private void Next()
+    {
+        UriHelper.NavigateTo("/");
+    }
+
+    private async Task Exit()
+    {
+        await JsRuntime.InvokeVoidAsync($"window.close()");
+    }
+}

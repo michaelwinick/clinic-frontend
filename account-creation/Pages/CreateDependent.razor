@@ -1,0 +1,63 @@
+﻿@page "/CreateDependent/{parentAccountId}"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Dependent Information</h1>
+<br/>
+
+<EditForm Model="@_informationModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>Dependent's First Name:</div>
+    <InputText id="name" @bind-Value="_informationModel.DependentFirstName" />
+    <div>Title:</div>
+    <InputText id="name" @bind-Value="_informationModel.Title" />
+    <div>Dependent's Last Name:</div>
+    <InputText id="name" @bind-Value="_informationModel.DependentLastName" />
+    <div>Month:</div>
+    <InputText id="name" @bind-Value="_informationModel.Month" />
+    <div>Day:</div>
+    <InputText id="name" @bind-Value="_informationModel.Day" />
+    <div>Year:</div>
+    <InputText id="name" @bind-Value="_informationModel.Year" />
+    <br/>
+    <button type="submit">Next</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string parentAccountId{ get; set; }
+
+    private InformationModel _informationModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        _informationModel.ParentId = parentAccountId;
+
+        var response = await _httpClient.PostAsync("https://localhost:7083/api/Accounts/personal/createDependentAccount", 
+            new StringContent(JsonConvert.SerializeObject(_informationModel), Encoding.UTF8, "application/json"));
+
+        var dependentAccountId = await response.Content.ReadAsStringAsync();
+
+        
+        UriHelper.NavigateTo($"/parentAccountCredentials/{parentAccountId}/{dependentAccountId}");
+    }
+
+    private class InformationModel
+    {
+        public string ParentId { get; set; }
+        public string DependentFirstName { get; set; } = "Tiger";
+        public string Title { get; set; } = "Golf Champion";
+        public string DependentLastName { get; set; } = "Woods";
+        public string Month { get; set; } = "12";
+        public string Day { get; set; } = "30";
+        public string Year { get; set; } = "1975";
+    }
+}

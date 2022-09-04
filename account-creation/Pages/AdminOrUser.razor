@@ -1,0 +1,28 @@
+﻿@page "/adminOrUser/{clinicId}"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>What type of user is this?</h1>
+<br/>
+<br/>
+<button class="btn btn-primary" @onclick="Administrator">Administrator</button>
+<button class="btn btn-primary" @onclick="StandardUser">Standard User</button>
+
+@code {
+    [Parameter]
+    public string clinicId{ get; set; }
+
+    private void Administrator()
+    {
+        UriHelper.NavigateTo($"/startCreatingAdminAccount/{clinicId}");
+    }
+
+    private void StandardUser()
+    {
+        UriHelper.NavigateTo($"/startCreatingEmployeeAccount/{clinicId}");
+    }
+}

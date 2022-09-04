@@ -1,0 +1,50 @@
+﻿@page "/clinicAccountCreated/{accountId}/{clinicId}"
+@using Microsoft.AspNetCore.Components
+@using System.Text.Json.Serialization
+@inject NavigationManager UriHelper
+@inject IJSRuntime JsRuntime
+
+
+<PageTitle>Created Account</PageTitle>
+
+<h1>Enter your Clinic ID</h1>
+<br/>
+<div>A Tandem Clinic ID is used to identify and verify your healthcare practice.</div>
+<br/>
+
+<EditForm Model="@invitationModel" OnValidSubmit="@HandleValidSubmit">
+<DataAnnotationsValidator />
+<ValidationSummary />
+<div>A Tandem Clinic ID is used to identify and verify your healthcare practice.</div>
+<InputText id="name" @bind-Value="invitationModel.Invitation" />
+<br/>
+<button type="submit">Next</button>
+</EditForm>
+
+
+<button class="btn btn-primary" @onclick="HandleValidSubmit">Create Administrator(s)</button>
+
+
+
+@code {
+    [Parameter]
+    public string accountId { get; set; }
+    [Parameter]
+    public string clinicId{ get; set; }
+
+
+    public record Invitation([property: JsonPropertyName("invitation")] string invitation);
+
+    private InvitationModel invitationModel = new();
+
+
+    private void HandleValidSubmit()
+    {
+        UriHelper.NavigateTo($"/startCreatingAdminAccount/{clinicId}");
+    }
+
+    private class InvitationModel
+    {
+        public string? Invitation { get; set; }
+    }
+}

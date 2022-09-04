@@ -1,0 +1,58 @@
+﻿@page "/"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Grant Clinic Access Rights to Reports</h1>
+<br/>
+
+<EditForm Model="@invitationModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>Enter Clinic ID: </div>    
+    <InputText id="name" @bind-Value="invitationModel.ClinicId" />
+    <div>Enter Pump Account Id: </div>    
+    <InputText id="name" @bind-Value="invitationModel.PumperAccountId" />
+    <br/>
+    <button type="submit">Next</button>
+</EditForm>
+
+@code {
+
+    
+
+    //public record Invitation([property: JsonPropertyName("clinicId")] string clinicId);
+
+
+    private MyInvitationModel invitationModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        Logger.LogInformation("HandleValidSubmit called in Enter ClinicId");
+
+        var response = await _httpClient.PostAsync("https://localhost:7173/api/pumper/GiveAccessToHcp", 
+            new StringContent(JsonConvert.SerializeObject(invitationModel), Encoding.UTF8, "application/json"));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Logger.LogError(response.ReasonPhrase);
+            return;
+        }
+        var clinicAccountId = await response.Content.ReadAsStringAsync();
+
+        
+        UriHelper.NavigateTo($"/clinicInvited/{invitationModel.ClinicId}/{invitationModel.PumperAccountId}");
+    }
+
+    private class MyInvitationModel
+    {
+        public string ClinicId { get; set; }
+        public string PumperAccountId { get; set; }
+    }
+
+}

@@ -1,0 +1,59 @@
+﻿@page "/clinicAccountInformation/{accountId}/{clinicId}"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+<PageTitle>Clinic Information</PageTitle>
+
+<h1>Clinic Information</h1>
+Your information will be used to help patients identify your Clinic.
+<br/>
+
+<EditForm Model="@informationModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>Clinic Name </div>    
+    <InputText id="name" @bind-Value="informationModel.ClinicName" />
+    <div>Clinic Address </div>    
+    <InputText id="name" @bind-Value="informationModel.ClinicAddress" />
+    <div>Country</div>
+    <InputText id="name" @bind-Value="informationModel.Country" />
+    <div>Region</div>
+    <InputText id="name" @bind-Value="informationModel.Region" />
+    
+    <br/>
+    <br/>
+
+    <button type="submit">Next</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string accountId{ get; set; }
+
+    [Parameter]
+    public string clinicId{ get; set; }
+
+
+    private InformationModel informationModel = new();
+
+
+    private async Task HandleValidSubmit()
+    {
+        informationModel.AccountId = accountId;
+
+        var response = await _httpClient.PostAsync($"https://localhost:7083/api/Accounts/professional/completeCreatingClinicAccount", 
+            new StringContent(JsonConvert.SerializeObject(informationModel), Encoding.UTF8, "application/json"));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"completeCreatingClinicAccount failed for account: {accountId}");
+        }
+
+        UriHelper.NavigateTo($"/startCreatingAdminAccount/{clinicId}");
+    }
+}

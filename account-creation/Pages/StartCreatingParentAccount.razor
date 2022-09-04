@@ -1,0 +1,50 @@
+﻿@page "/StartCreatingParentAccount"
+@using Microsoft.Extensions.Logging
+@using System.Text.Json.Serialization
+@using System.Text
+@using Newtonsoft.Json
+@inject ILogger<Index> Logger
+@inject NavigationManager UriHelper
+@inject HttpClient _httpClient
+
+
+<h1>Parent/Guardian Information</h1>
+<br/>
+
+<h1>Create Parent/Guardian Account</h1>
+<br/>
+
+<EditForm Model="@_invitationModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    Enter Invitation: 
+    <InputText id="name" @bind-Value="_invitationModel.Invitation" />
+    <br/>
+    <button type="submit">Next</button>
+</EditForm>
+
+@code {
+
+    private readonly InvitationModel _invitationModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        var response = await _httpClient.PostAsync("https://localhost:7083/api/Accounts/personal/startCreatingParentAccount", 
+            new StringContent(JsonConvert.SerializeObject(_invitationModel), Encoding.UTF8, "application/json"));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"startCreatingParentAccount with Invitation: {_invitationModel.Invitation}");
+        }
+
+        var parentAccountId = await response.Content.ReadAsStringAsync();
+
+        UriHelper.NavigateTo($"/parentAccountInformation/{parentAccountId}/");
+    }
+
+    private class InvitationModel
+    {
+        public string Invitation  { get; set; }
+    }
+
+}
